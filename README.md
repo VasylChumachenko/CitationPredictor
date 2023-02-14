@@ -22,10 +22,10 @@ First, we need to import modules, set the path to the model, dataset, and additi
 from citation_predictor import CitationPredictor
 import matplotlib.pyplot as plt
 
-path_to_model='...'
-path_to_data='...'
-path_to_vocabulary='...'
-path_to_features='...'
+path_to_model='.../lgb_reg'
+path_to_data='.../demo_data.csv'
+path_to_vocabulary='.../vocabulary.csv'
+path_to_features='.../features.csv'
 predictor = CitationPredictor(path_to_model=path_to_model, 
                        path_to_data=path_to_data,
                        path_to_vocabulary=path_to_vocabulary,
