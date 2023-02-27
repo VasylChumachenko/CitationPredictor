@@ -11,7 +11,11 @@ setup(
     packages=['citation_predictor'],
     install_requires=['pandas',
                       'numpy',
-                      ''],
+                      'lightgbm',
+                      'sklearn',
+                      'shap',
+                      'matplotlib',
+                      'nltk'],
 
     classifiers=[
         'Development Status :: 1 - alpha',

@@ -8,8 +8,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import shap
 import matplotlib.pyplot as plt
 
+__version__='0.0.1'
 
 def Stem_data(data, column_name):
+    # apply stemming to columns
     stemmer = SnowballStemmer("english")
     data['stemmed'] = data[column_name].apply(lambda x: filter(None, x.split(" ")))
     data['stemmed_2'] = data['stemmed'].apply(lambda x: [stemmer.stem(y) for y in x])
@@ -61,6 +63,7 @@ class CitationPredictor:
         return demo_df
 
     def _preprocess(self):
+        # extracts and vectorizes text features
         if self.raw_data is None:
             print('Load .csv data first')
             raise AttributeError
@@ -105,6 +108,7 @@ class CitationPredictor:
         self.data = self.data[self._important_features]
 
     def predict(self, n_years=1):
+        # makes ground predictions and edge quantile preductions
         self._preprocess()
         self.values = np.array(n_years * self._values, dtype='float32')
         self.preds = np.array(
@@ -122,6 +126,7 @@ class CitationPredictor:
         return self.preds
 
     def get_results(self):
+        # constructs dataframe from raw results
         if self.values is None:
             print('Run .predict() method first')
             raise AttributeError
@@ -145,6 +150,7 @@ class CitationPredictor:
         return result
 
     def explain_values(self, max_display=10):
+        # explanes single prediction by SHAP values
         self.model.params["objective"] = "regression"
         explainer = shap.Explainer(self.model)
         shap_values = explainer(self.data)
@@ -160,6 +166,7 @@ class CitationPredictor:
         current_number_of_publications=0,
         quantile='ground',
     ):
+        # estimates H-index of a researcher with given publications
         if self.values is None:
             print('Run .predict() method first')
             raise AttributeError
