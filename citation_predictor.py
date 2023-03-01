@@ -7,9 +7,10 @@ from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 import shap
 import matplotlib.pyplot as plt
+import requests
+
 
 def Stem_data(data, column_name):
-    # apply stemming to columns
     stemmer = SnowballStemmer("english")
     data['stemmed'] = data[column_name].apply(lambda x: filter(None, x.split(" ")))
     data['stemmed_2'] = data['stemmed'].apply(lambda x: [stemmer.stem(y) for y in x])
@@ -17,7 +18,6 @@ def Stem_data(data, column_name):
     data.drop(['stemmed', 'stemmed_2'], axis=1, inplace=True)
     data.reset_index(drop=True, inplace=True)
     return data
-
 
 class CitationPredictor:
     def __init__(
@@ -46,14 +46,22 @@ class CitationPredictor:
     def _load_model(self, path_to_model):
         if path_to_model == None:
             return
+        if 'http' in path_to_model:
+            model_str=self._load_from_url(path_to_model)
+            model=lgb.Booster(model_str=model_str)
+            return model
         model = lgb.Booster(model_file=path_to_model)
         return model
+    
+    def _load_from_url(self, url):
+        resp=requests.get(url)
+        return resp.text
 
     def _load_vocabulary(self, path_to_vocabulary):
         if path_to_vocabulary == None:
             return
         return list(pd.read_csv(path_to_vocabulary)['0'])
-
+        
     def _load_demo(self, path_to_data):
         if path_to_data == None:
             return
@@ -61,7 +69,6 @@ class CitationPredictor:
         return demo_df
 
     def _preprocess(self):
-        # extracts and vectorizes text features
         if self.raw_data is None:
             print('Load .csv data first')
             raise AttributeError
@@ -106,7 +113,6 @@ class CitationPredictor:
         self.data = self.data[self._important_features]
 
     def predict(self, n_years=1):
-        # makes ground predictions and edge quantile preductions
         self._preprocess()
         self.values = np.array(n_years * self._values, dtype='float32')
         self.preds = np.array(
@@ -124,7 +130,6 @@ class CitationPredictor:
         return self.preds
 
     def get_results(self):
-        # constructs dataframe from raw results
         if self.values is None:
             print('Run .predict() method first')
             raise AttributeError
@@ -148,7 +153,6 @@ class CitationPredictor:
         return result
 
     def explain_values(self, max_display=10):
-        # explanes single prediction by SHAP values
         self.model.params["objective"] = "regression"
         explainer = shap.Explainer(self.model)
         shap_values = explainer(self.data)
@@ -164,7 +168,6 @@ class CitationPredictor:
         current_number_of_publications=0,
         quantile='ground',
     ):
-        # estimates H-index of a researcher with given publications
         if self.values is None:
             print('Run .predict() method first')
             raise AttributeError
@@ -183,7 +186,6 @@ class CitationPredictor:
             )
         h_index = current_h_index
         total_papers = current_number_of_publications + len(rounded_preds)
-        print(rounded_preds)
         for i in range(len(rounded_preds)):
             if rounded_preds[i] > h_index and total_papers > current_h_index:
                 h_index += 1
