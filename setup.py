@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='citation_predictor',
-    version='0.0.2',    
+    version='0.0.3',    
     description='POC',
     url='https://github.com/VasylChumachenko/CitationPredictor.git',
     author='Vasyl Chumachenko',
