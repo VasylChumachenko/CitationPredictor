@@ -1,1 +1,1 @@
-import .citation_predictor as citation_predictor
+from . import *
