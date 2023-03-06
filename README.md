@@ -32,3 +32,9 @@ Finally, we can run explain_values() method to have some interpretability throug
 predictor.explain_values()
 ```
 Please note that matplotlib has to be imported in order to properly display SHAP
+
+## Demo
+
+Demo notebook is here:
+
+https://drive.google.com/file/d/1B3s5lBYJGYA5aDrtToVnRe0LsGmfY9UJ/view?usp=share_link
